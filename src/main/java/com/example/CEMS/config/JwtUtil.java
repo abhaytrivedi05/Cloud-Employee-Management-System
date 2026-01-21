@@ -19,6 +19,7 @@ public class JwtUtil {
 
     private final long EXPIRATION = 1000 * 60 * 60; // 1 hour
 
+    // ✅ Generate JWT
     public String generateToken(String username, String role) {
         return Jwts.builder()
                 .setSubject(username)
@@ -29,25 +30,38 @@ public class JwtUtil {
                 .compact();
     }
 
+    // ✅ Extract username
     public String extractUsername(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        return getClaims(token).getSubject();
     }
 
+    // ✅ Extract role
     public String extractRole(String token) {
+        return getClaims(token).get("role", String.class);
+    }
+
+    // ✅ Centralized claims parser
+    private Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .get("role", String.class);
+                .getBody();
     }
 
+    // ✅ Strong validation
     public boolean validateToken(String token, String username) {
-        return extractUsername(token).equals(username);
+        try {
+            Claims claims = getClaims(token);
+
+            String tokenUsername = claims.getSubject();
+            Date expiration = claims.getExpiration();
+
+            return tokenUsername.equals(username)
+                    && expiration.after(new Date());
+
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 }

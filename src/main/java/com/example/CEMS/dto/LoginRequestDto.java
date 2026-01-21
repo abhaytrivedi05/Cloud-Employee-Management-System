@@ -5,7 +5,7 @@ public class LoginRequestDto {
     private String username;
     private String password;
 
-    // ✅ getters
+    // getters
     public String getUsername() {
         return username;
     }
@@ -14,7 +14,7 @@ public class LoginRequestDto {
         return password;
     }
 
-    // ✅ setters
+    // setters
     public void setUsername(String username) {
         this.username = username;
     }

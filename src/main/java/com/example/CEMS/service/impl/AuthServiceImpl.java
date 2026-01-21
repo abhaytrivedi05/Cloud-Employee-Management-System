@@ -1,43 +1,39 @@
 package com.example.CEMS.service.impl;
 
-import com.example.CEMS.config.JwtUtil;
-import com.example.CEMS.dto.LoginRequestDto;
-import com.example.CEMS.dto.LoginResponseDto;
+import com.example.CEMS.dto.RegisterRequestDto;
 import com.example.CEMS.entity.User;
 import com.example.CEMS.repository.UserRepository;
 import com.example.CEMS.service.AuthService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-//@Service
+@Service
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
     public AuthServiceImpl(UserRepository userRepository,
-                           BCryptPasswordEncoder passwordEncoder,
-                           JwtUtil jwtUtil) {
+                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
     }
 
     @Override
-    public LoginResponseDto login(LoginRequestDto request) {
+    public String register(RegisterRequestDto dto) {
 
-        User user = userRepository
-                .findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (!passwordEncoder.matches(
-                request.getPassword(),
-                user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+        if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
+            throw new RuntimeException("Username already exists");
         }
 
-        String token = jwtUtil.generateToken(user.getUsername());
-        return new LoginResponseDto(token);
+        User user = new User();
+        user.setUsername(dto.getUsername());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setRole("USER");
+        user.setActive(true);
+
+        userRepository.save(user);
+
+        return "User registered successfully";
     }
 }

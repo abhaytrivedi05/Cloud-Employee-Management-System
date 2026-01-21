@@ -8,6 +8,6 @@ public class TestController {
 
     @GetMapping("/api/test/hello")
     public String hello() {
-        return "Security working fine ✅";
+        return "Security working fine ";
     }
 }

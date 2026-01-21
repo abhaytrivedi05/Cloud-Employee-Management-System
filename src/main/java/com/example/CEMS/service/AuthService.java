@@ -1,8 +1,8 @@
 package com.example.CEMS.service;
 
-import com.example.CEMS.dto.LoginRequestDto;
-import com.example.CEMS.dto.LoginResponseDto;
+import com.example.CEMS.dto.RegisterRequestDto;
 
 public interface AuthService {
-    LoginResponseDto login(LoginRequestDto request);
+
+    String register(RegisterRequestDto dto);
 }
